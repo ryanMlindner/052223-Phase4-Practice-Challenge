@@ -56,8 +56,7 @@ if __name__ == '__main__':
 
     print("Opening CSV...")
     with open('server/seed.csv', newline='') as csvfile:
-        #really? thats how you wrote that path?
-        #in prod?
+        #huh
         rows = [row for row in csv.reader(csvfile, delimiter=',', quotechar='|')]
         print("Seeding episodes...")
         episodes = create_episodes(rows)
