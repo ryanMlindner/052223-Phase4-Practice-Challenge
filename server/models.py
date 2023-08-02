@@ -20,9 +20,9 @@ class Episode(db.Model, SerializerMixin):
     date = db.Column(db.String)
     number = db.Column(db.Integer)
 
-    # add relationship
+    appearances = db.relationship("Appearance", cascade="all, delete-orphan", backref="episode")
     
-    # add serialization rules
+    serialize_rules = ('-appearances.episode', '-appearances.guest')
     
 
 class Guest(db.Model, SerializerMixin):
@@ -32,9 +32,9 @@ class Guest(db.Model, SerializerMixin):
     name = db.Column(db.String)
     occupation = db.Column(db.String)
 
-    # add relationship
+    appearances = db.relationship("Appearance", cascade="all, delete-orphan", backref="guest")
     
-    # add serialization rules
+    serialize_rules = ('-appearances.episode', '-appearances.guest')
     
 
 class Appearance(db.Model, SerializerMixin):
@@ -43,10 +43,14 @@ class Appearance(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     rating = db.Column(db.Integer)
 
-    # add relationships
+    episode_id = db.Column(db.Integer, db.ForeignKey("episodes.id"))
+    guest_id = db.Column(db.Integer, db.ForeignKey("guests.id"))
     
-    # add serialization rules
+    serialize_rules = ('-guest.appearances', '-episode.appearances')
     
-    # add validation
-    
-# add any models you may need.
+    @validates('rating')
+    def validate_scientist(self, key, entry):
+        #key is used for multiple validations in the same function, is it required for one? @marc
+        if entry == None or entry > 5 or entry < 1:
+            raise ValueError("rating must be between 1 and 5")
+        return entry
